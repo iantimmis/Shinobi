@@ -195,17 +195,51 @@ This project uses `uv` as the Python package manager and environment tool. Follo
     (cursor_dir / "use-uv-always.mdc").write_text(rules_content)
 
 
+def validate_project_name(name: str) -> tuple[bool, str]:
+    """Validate project name according to Python package naming rules.
+
+    Rules:
+    - Must start and end with a letter or digit
+    - May only contain -, _, ., and alphanumeric characters
+    """
+    import re
+
+    if not name:
+        return False, "Project name cannot be empty"
+
+    # Check if starts and ends with letter/digit
+    if not (name[0].isalnum() and name[-1].isalnum()):
+        return False, "Project name must start and end with a letter or digit"
+
+    # Check if contains only allowed characters
+    if not re.match(r"^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]$", name):
+        return False, "Project name may only contain letters, digits, '-', '_', and '.'"
+
+    return True, ""
+
+
 def get_project_config() -> dict:
     """Get project configuration through interactive prompts."""
     console.print(
         "\n[bold blue]Welcome to Shinobi! Let's set up your project.[/bold blue]\n"
     )
 
-    # Get project name
-    project_name = questionary.text(
-        "What's the name of your project?",
-        validate=lambda text: len(text) > 0,
-    ).ask()
+    # Get project name with validation
+    while True:
+        project_name = questionary.text(
+            "What's the name of your project?",
+            validate=lambda text: len(text) > 0,
+        ).ask()
+
+        is_valid, error_msg = validate_project_name(project_name)
+        if is_valid:
+            break
+
+        console.print(f"[red]Invalid project name: {error_msg}[/red]")
+        console.print("[yellow]Project names must:[/yellow]")
+        console.print("- Start and end with a letter or digit")
+        console.print("- May only contain letters, digits, '-', '_', and '.'")
+        console.print("Please try again.\n")
 
     # Get project description
     description = questionary.text(
