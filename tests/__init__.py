@@ -1,1 +1,1 @@
-"""Tests for the shinobi package.""" 
+"""Tests for the shinobi package."""
