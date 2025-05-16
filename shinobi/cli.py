@@ -263,9 +263,14 @@ def get_project_config() -> dict:
 
 def create_readme(project_path: Path, config: dict) -> None:
     """Create a comprehensive README.md file for the project."""
-    readme_content = f"""# {config["project_name"]}
+    readme_content = f"""<div align="center">
+<h1> {config["project_name"]} </h1>
 
 {config["description"] or "A Python project initialized with Shinobi."}
+
+</div>
+
+---
 
 ## Features
 
