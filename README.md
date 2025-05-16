@@ -1,7 +1,7 @@
 <div align="center">
-<h1> {config["project_name"]} </h1>
+<h1> Shinobi </h1>
 
-{config["description"] or "A Python project initialized with Shinobi."}
+Enhanced project initialization tool built on top of `uv`. Shinobi helps you set up Python projects with best practices and common tools pre-configured.
 
 </div>
 
