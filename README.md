@@ -1,51 +1,68 @@
 <div align="center">
-<h1> Shinobi </h1>
+<h1> {config["project_name"]} </h1>
 
-Enhanced project initialization tool built on top of `uv`. Shinobi helps you set up Python projects with best practices and common tools pre-configured.
+{config["description"] or "A Python project initialized with Shinobi."}
 
 </div>
 
 ---
 
-## Features
+## ✨ Features
 
-- Built on top of `uv init` for fast dependency management
-- Automatic setup of:
-  - Ruff for linting and formatting
-  - Pre-commit hooks for Ruff
-  - Proper project structure with `src` layout
-  - Tests directory with `pytest` setup
-  - Main entry point as `main.py`
-- Optional GitHub integration:
-  - GitHub Actions workflows for linting
-  - GitHub Actions workflows for testing
+### 🛠️ Project Structure
+
+- Modern Python project structure with `src` layout
+- Comprehensive test suite with pytest
+- Optimized Python `.gitignore` from Toptal
+- MIT License template
+
+### 📦 Dependency Management
+
+- Fast and reliable dependency management with `uv`
+- Development dependencies group for testing and linting
+- Pre-commit hooks for automated checks
+
+### 🧰 Code Quality
+
+- Ruff for lightning-fast linting and formatting
+- Pre-commit hooks for automated code quality checks
+- GitHub Actions workflows for CI/CD
+
+### 🎯 IDE Support
+
+- VS Code configuration with Ruff integration
+- Cursor IDE rules for UV usage
+- Editor-agnostic project structure
+
+### 🔧 Development Tools
+
+- GitHub Actions workflows for:
+  - Automated linting with Ruff
+  - Automated testing with pytest
+- Pre-commit hooks for:
+  - Ruff linting
+  - Ruff formatting
 
 ## Installation
 
 ```bash
-pip install -e .
+# Clone the repository
+git clone https://github.com/yourusername/{config["project_name"]}.git
+cd {config["project_name"]}
+
+# Install dependencies
+uv pip install -e '.[dev]'
+
+# Set up pre-commit hooks (if enabled)
+uv run pre-commit install
 ```
 
-## Usage
+## Development
 
-Basic usage:
-
-```bash
-shinobi init my-project
-```
-
-With GitHub workflows:
-
-```bash
-shinobi init my-project --github
-```
-
-## Project Structure
-
-After initialization, your project will have the following structure:
+### Project Structure
 
 ```
-my-project/
+{config["project_name"]}/
 ├── src/
 │   └── main.py
 ├── tests/
@@ -55,22 +72,24 @@ my-project/
 └── README.md
 ```
 
-If using GitHub integration, it will also include:
+### Running Tests
 
-```
-my-project/
-└── .github/
-    └── workflows/
-        ├── lint.yml
-        └── test.yml
+```bash
+pytest
 ```
 
-## Development
+### Code Quality
 
-To contribute to Shinobi:
+This project uses Ruff for linting and formatting. To run the checks:
 
-1. Clone the repository
-2. Install development dependencies: `pip install -e ".[dev]"`
-3. Make your changes
-4. Run tests: `pytest`
-5. Submit a pull request
+```bash
+# Lint
+uvx ruff check
+
+# Format
+uvx ruff format
+```
+
+## License
+
+[MIT License](LICENSE)

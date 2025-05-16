@@ -58,9 +58,7 @@ dev = [
 """
             # Find the right spot to insert it (after [project] section)
             if "[build-system]" in content:
-                content = content.replace(
-                    "[build-system]", dev_section + "\n[build-system]"
-                )
+                content = content.replace("[build-system]", dev_section + "\n[build-system]")
             else:
                 content += dev_section
 
@@ -74,9 +72,7 @@ dev = [
 
         pyproject_path.write_text(content)
 
-    console.print(
-        "[yellow]Added pre-commit to dev dependencies. To install it, run:[/yellow]"
-    )
+    console.print("[yellow]Added pre-commit to dev dependencies. To install it, run:[/yellow]")
     console.print(
         f"[green]cd {project_path} && uv pip install -e '.[dev]' && pre-commit install[/green]"  # noqa: E501
     )
@@ -220,9 +216,7 @@ def validate_project_name(name: str) -> tuple[bool, str]:
 
 def get_project_config() -> dict:
     """Get project configuration through interactive prompts."""
-    console.print(
-        "\n[bold blue]Welcome to Shinobi! Let's set up your project.[/bold blue]\n"
-    )
+    console.print("\n[bold blue]Welcome to Shinobi! Let's set up your project.[/bold blue]\n")
 
     # Get project name with validation
     while True:
@@ -401,6 +395,185 @@ SOFTWARE.
     (project_path / "LICENSE").write_text(license_content)
 
 
+def update_pyproject_description(pyproject_path: Path, description: str) -> None:
+    """Update the project description in pyproject.toml."""
+    if not description:
+        return
+
+    if pyproject_path.exists():
+        content = pyproject_path.read_text()
+
+        # Escape quotes and handle multiline descriptions
+        escaped_description = description.replace('"', '\\"').replace("\n", "\\n")
+
+        # Try to replace empty description first
+        if 'description = ""' in content:
+            content = content.replace('description = ""', f'description = "{escaped_description}"')
+        # If no empty description, try to replace existing one
+        elif 'description = "' in content:
+            import re
+
+            content = re.sub(
+                r'description = "[^"]*"',
+                f'description = "{escaped_description}"',
+                content,
+            )
+        # If no description field exists, add it after the name field
+        else:
+            content = content.replace('name = "', f'name = "\ndescription = "{escaped_description}"')
+
+        pyproject_path.write_text(content)
+
+
+def create_gitignore(project_path: Path) -> None:
+    """Create a comprehensive .gitignore file for Python projects."""
+    gitignore_content = (
+        "# Created by https://www.toptal.com/developers/gitignore/api/python\n"
+        "# Edit at https://www.toptal.com/developers/gitignore?templates=python\n\n"
+        "### Python ###\n"
+        "# Byte-compiled / optimized / DLL files\n"
+        "__pycache__/\n"
+        "*.py[cod]\n"
+        "*$py.class\n\n"
+        "# C extensions\n"
+        "*.so\n\n"
+        "# Distribution / packaging\n"
+        ".Python\n"
+        "build/\n"
+        "develop-eggs/\n"
+        "dist/\n"
+        "downloads/\n"
+        "eggs/\n"
+        ".eggs/\n"
+        "lib/\n"
+        "lib64/\n"
+        "parts/\n"
+        "sdist/\n"
+        "var/\n"
+        "wheels/\n"
+        "share/python-wheels/\n"
+        "*.egg-info/\n"
+        ".installed.cfg\n"
+        "*.egg\n"
+        "MANIFEST\n\n"
+        "# PyInstaller\n"
+        "#  Usually these files are written by a python script from a template\n"
+        "#  before PyInstaller builds the exe, so as to inject date/other infos into it.\n"
+        "*.manifest\n"
+        "*.spec\n\n"
+        "# Installer logs\n"
+        "pip-log.txt\n"
+        "pip-delete-this-directory.txt\n\n"
+        "# Unit test / coverage reports\n"
+        "htmlcov/\n"
+        ".tox/\n"
+        ".nox/\n"
+        ".coverage\n"
+        ".coverage.*\n"
+        ".cache\n"
+        "nosetests.xml\n"
+        "coverage.xml\n"
+        "*.cover\n"
+        "*.py,cover\n"
+        ".hypothesis/\n"
+        ".pytest_cache/\n"
+        "cover/\n\n"
+        "# Translations\n"
+        "*.mo\n"
+        "*.pot\n\n"
+        "# Django stuff:\n"
+        "*.log\n"
+        "local_settings.py\n"
+        "db.sqlite3\n"
+        "db.sqlite3-journal\n\n"
+        "# Flask stuff:\n"
+        "instance/\n"
+        ".webassets-cache\n\n"
+        "# Scrapy stuff:\n"
+        ".scrapy\n\n"
+        "# Sphinx documentation\n"
+        "docs/_build/\n\n"
+        "# PyBuilder\n"
+        ".pybuilder/\n"
+        "target/\n\n"
+        "# Jupyter Notebook\n"
+        ".ipynb_checkpoints\n\n"
+        "# IPython\n"
+        "profile_default/\n"
+        "ipython_config.py\n\n"
+        "# pyenv\n"
+        "#   For a library or package, you might want to ignore these files since the code is\n"
+        "#   intended to run in multiple environments; otherwise, check them in:\n"
+        "# .python-version\n\n"
+        "# pipenv\n"
+        "#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.\n"
+        "#   However, in case of collaboration, if having platform-specific dependencies or dependencies\n"
+        "#   having no cross-platform support, pipenv may install dependencies that don't work, or not\n"
+        "#   install all needed dependencies.\n"
+        "#Pipfile.lock\n\n"
+        "# poetry\n"
+        "#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.\n"
+        "#   This is especially recommended for binary packages to ensure reproducibility, and is more\n"
+        "#   commonly ignored for libraries.\n"
+        "#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control\n"
+        "#poetry.lock\n\n"
+        "# pdm\n"
+        "#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.\n"
+        "#pdm.lock\n"
+        "#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it\n"
+        "#   in version control.\n"
+        "#   https://pdm.fming.dev/#use-with-ide\n"
+        ".pdm.toml\n\n"
+        "# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm\n"
+        "__pypackages__/\n\n"
+        "# Celery stuff\n"
+        "celerybeat-schedule\n"
+        "celerybeat.pid\n\n"
+        "# SageMath parsed files\n"
+        "*.sage.py\n\n"
+        "# Environments\n"
+        ".env\n"
+        ".venv\n"
+        "env/\n"
+        "venv/\n"
+        "ENV/\n"
+        "env.bak/\n"
+        "venv.bak/\n\n"
+        "# Spyder project settings\n"
+        ".spyderproject\n"
+        ".spyproject\n\n"
+        "# Rope project settings\n"
+        ".ropeproject\n\n"
+        "# mkdocs documentation\n"
+        "/site\n\n"
+        "# mypy\n"
+        ".mypy_cache/\n"
+        ".dmypy.json\n"
+        "dmypy.json\n\n"
+        "# Pyre type checker\n"
+        ".pyre/\n\n"
+        "# pytype static type analyzer\n"
+        ".pytype/\n\n"
+        "# Cython debug symbols\n"
+        "cython_debug/\n\n"
+        "# PyCharm\n"
+        "#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can\n"
+        "#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore\n"
+        "#  and can be added to the global gitignore or merged into this file.  For a more nuclear\n"
+        "#  option (not recommended) you can uncomment the following to ignore the entire idea folder.\n"
+        "#.idea/\n\n"
+        "### Python Patch ###\n"
+        "# Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration\n"
+        "poetry.toml\n\n"
+        "# ruff\n"
+        ".ruff_cache/\n\n"
+        "# LSP config files\n"
+        "pyrightconfig.json\n\n"
+        "# End of https://www.toptal.com/developers/gitignore/api/python"
+    )
+    (project_path / ".gitignore").write_text(gitignore_content)
+
+
 @app.command()
 def init() -> None:
     """Initialize a new Python project with enhanced features."""
@@ -408,9 +581,7 @@ def init() -> None:
     project_path = Path(config["project_name"])
 
     if project_path.exists():
-        if not Confirm.ask(
-            f"Directory {config['project_name']} already exists. Continue?"
-        ):
+        if not Confirm.ask(f"Directory {config['project_name']} already exists. Continue?"):
             raise typer.Exit()
 
     # Run uv init
@@ -433,6 +604,9 @@ def init() -> None:
     tests_dir = project_path / "tests"
     tests_dir.mkdir(exist_ok=True)
     (tests_dir / "__init__.py").touch()
+
+    # Create .gitignore
+    create_gitignore(project_path)
 
     # Set up features based on selection
     if "precommit" in config["features"]:
@@ -461,9 +635,7 @@ dev = [
 """
                 # Find the right spot to insert it (after [project] section)
                 if "[build-system]" in content:
-                    content = content.replace(
-                        "[build-system]", dev_section + "\n[build-system]"
-                    )
+                    content = content.replace("[build-system]", dev_section + "\n[build-system]")
                 else:
                     content += dev_section
 
@@ -472,9 +644,7 @@ dev = [
                 # Insert pytest into existing dev dependencies
                 import re
 
-                dev_pattern = (
-                    r"(\[dependency-groups\]\s*\ndev\s*=\s*\[(?:[^\]]*\n)?)(\])"
-                )
+                dev_pattern = r"(\[dependency-groups\]\s*\ndev\s*=\s*\[(?:[^\]]*\n)?)(\])"
                 content = re.sub(dev_pattern, r'\1    "pytest>=7.0.0",\n\2', content)
 
             pyproject_path.write_text(content)
@@ -487,14 +657,7 @@ dev = [
 ''')
 
     # Update pyproject.toml with project description
-    if config["description"]:
-        pyproject_path = project_path / "pyproject.toml"
-        if pyproject_path.exists():
-            content = pyproject_path.read_text()
-            content = content.replace(
-                'description = ""', f'description = "{config["description"]}"'
-            )
-            pyproject_path.write_text(content)
+    update_pyproject_description(project_path / "pyproject.toml", config["description"])
 
     # Create a comprehensive README.md
     create_readme(project_path, config)
@@ -516,9 +679,7 @@ dev = [
     if "precommit" in config["features"]:
         console.print("3. Set up pre-commit: pre-commit install")
     if "github" in config["features"]:
-        console.print(
-            "4. Initialize git repository: git init && git add . && git commit -m 'Initial commit'"  # noqa: E501
-        )
+        console.print("4. Initialize git repository: git init && git add . && git commit -m 'Initial commit'")
 
 
 if __name__ == "__main__":
