@@ -47,7 +47,38 @@ def setup_ruff(project_path: Path) -> None:
     if pyproject_path.exists():
         content = pyproject_path.read_text()
 
-        # Add Ruff configuration
+        # Check if dev dependencies section exists
+        if "[dependency-groups]" not in content:
+            # Add dev dependencies section with pre-commit and ruff
+            dev_section = """
+[dependency-groups]
+dev = [
+    "pre-commit>=3.0.0",
+    "ruff>=0.3.0",
+]
+"""
+            # Find the right spot to insert it (after [project] section)
+            if "[build-system]" in content:
+                content = content.replace(
+                    "[build-system]", dev_section + "\n[build-system]"
+                )
+            else:
+                content += dev_section
+
+        # Check if pre-commit and ruff are already in dev dependencies
+        elif "pre-commit" not in content or "ruff" not in content:
+            # Insert pre-commit and ruff into existing dev dependencies
+            import re
+
+            dev_pattern = r"(\[dependency-groups\]\s*\ndev\s*=\s*\[(?:[^\]]*\n)?)(\])"
+            if "pre-commit" not in content:
+                content = re.sub(
+                    dev_pattern, r'\1    "pre-commit>=3.0.0",\n\2', content
+                )
+            if "ruff" not in content:
+                content = re.sub(dev_pattern, r'\1    "ruff>=0.3.0",\n\2', content)
+
+        # Add Ruff configuration at the end of the file
         ruff_config = """
 [tool.ruff]
 line-length = 88
@@ -61,43 +92,12 @@ ignore = ["E501"]  # Example: ignore line length
 [tool.ruff.format]
 quote-style = "double"
 """
-        # Find the right spot to insert Ruff config (before [build-system] if it exists)
-        if "[build-system]" in content:
-            content = content.replace(
-                "[build-system]", ruff_config + "\n[build-system]"
-            )
-        else:
-            content += ruff_config
-
-        # Check if dev dependencies section exists
-        if "[dependency-groups]" not in content:
-            # Add dev dependencies section with pre-commit
-            dev_section = """
-[dependency-groups]
-dev = [
-    "pre-commit>=3.0.0",
-]
-"""
-            # Find the right spot to insert it (after [project] section)
-            if "[build-system]" in content:
-                content = content.replace(
-                    "[build-system]", dev_section + "\n[build-system]"
-                )
-            else:
-                content += dev_section
-
-        # Check if pre-commit is already in dev dependencies
-        elif "pre-commit" not in content:
-            # Insert pre-commit into existing dev dependencies
-            import re
-
-            dev_pattern = r"(\[dependency-groups\]\s*\ndev\s*=\s*\[(?:[^\]]*\n)?)(\])"
-            content = re.sub(dev_pattern, r'\1    "pre-commit>=3.0.0",\n\2', content)
+        content += ruff_config
 
         pyproject_path.write_text(content)
 
     console.print(
-        "[yellow]Added pre-commit to dev dependencies. To install it, run:[/yellow]"
+        "[yellow]Added pre-commit and ruff to dev dependencies. To install them, run:[/yellow]"
     )
     console.print(
         f"[green]cd {project_path} && uv pip install -e '.[dev]' && pre-commit install[/green]"
