@@ -32,6 +32,3 @@ packages = ["shinobi"]
 line-length = 120
 target-version = "py39"
 select = ["E", "F", "B", "I"]
-
-[tool.uv.workspace]
-members = ["shinobi-test", "test-proj", "testprjo", "test-project"]

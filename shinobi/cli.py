@@ -244,8 +244,8 @@ def get_project_config() -> dict:
     # Get Python version
     python_version = questionary.select(
         "Which Python version would you like to use?",
-        choices=["3.11", "3.12"],
-        default="3.11",
+        choices=["3.13", "3.12", "3.11"],
+        default="3.13",
     ).ask()
 
     # Get IDE preference
