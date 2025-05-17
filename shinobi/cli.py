@@ -41,11 +41,33 @@ def setup_ruff(project_path: Path) -> None:
 """
     (project_path / ".pre-commit-config.yaml").write_text(pre_commit_config)
 
-    # Add pre-commit to the development dependencies
-    # Modify pyproject.toml to include pre-commit in the dev dependencies
+    # Add pre-commit to the development dependencies and configure Ruff
+    # Modify pyproject.toml to include pre-commit in the dev dependencies and Ruff config
     pyproject_path = project_path / "pyproject.toml"
     if pyproject_path.exists():
         content = pyproject_path.read_text()
+
+        # Add Ruff configuration
+        ruff_config = """
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+fix = true
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]  # Example: ignore line length
+
+[tool.ruff.format]
+quote-style = "double"
+"""
+        # Find the right spot to insert Ruff config (before [build-system] if it exists)
+        if "[build-system]" in content:
+            content = content.replace(
+                "[build-system]", ruff_config + "\n[build-system]"
+            )
+        else:
+            content += ruff_config
 
         # Check if dev dependencies section exists
         if "[dependency-groups]" not in content:
@@ -58,7 +80,9 @@ dev = [
 """
             # Find the right spot to insert it (after [project] section)
             if "[build-system]" in content:
-                content = content.replace("[build-system]", dev_section + "\n[build-system]")
+                content = content.replace(
+                    "[build-system]", dev_section + "\n[build-system]"
+                )
             else:
                 content += dev_section
 
@@ -72,9 +96,11 @@ dev = [
 
         pyproject_path.write_text(content)
 
-    console.print("[yellow]Added pre-commit to dev dependencies. To install it, run:[/yellow]")
     console.print(
-        f"[green]cd {project_path} && uv pip install -e '.[dev]' && pre-commit install[/green]"  # noqa: E501
+        "[yellow]Added pre-commit to dev dependencies. To install it, run:[/yellow]"
+    )
+    console.print(
+        f"[green]cd {project_path} && uv pip install -e '.[dev]' && pre-commit install[/green]"
     )
 
 
@@ -187,7 +213,7 @@ This project uses `uv` as the Python package manager and environment tool. Follo
 - Update or install dependencies: `uv sync`
 - Run Python file: `uv run file.py`
 - Create new venv: `uv venv`
-"""  # noqa: E501
+"""
     (cursor_dir / "use-uv-always.mdc").write_text(rules_content)
 
 
@@ -216,7 +242,9 @@ def validate_project_name(name: str) -> tuple[bool, str]:
 
 def get_project_config() -> dict:
     """Get project configuration through interactive prompts."""
-    console.print("\n[bold blue]Welcome to Shinobi! Let's set up your project.[/bold blue]\n")
+    console.print(
+        "\n[bold blue]Welcome to Shinobi! Let's set up your project.[/bold blue]\n"
+    )
 
     # Get project name with validation
     while True:
@@ -263,7 +291,7 @@ def get_project_config() -> dict:
                 "name": "GitHub Actions",
                 "value": "github",
                 "checked": True,
-                "description": "Set up GitHub Actions workflows for linting and testing",  # noqa: E501
+                "description": "Set up GitHub Actions workflows for linting and testing",
             },
             {
                 "name": "Pre-commit hooks",
@@ -408,7 +436,9 @@ def update_pyproject_description(pyproject_path: Path, description: str) -> None
 
         # Try to replace empty description first
         if 'description = ""' in content:
-            content = content.replace('description = ""', f'description = "{escaped_description}"')
+            content = content.replace(
+                'description = ""', f'description = "{escaped_description}"'
+            )
         # If no empty description, try to replace existing one
         elif 'description = "' in content:
             import re
@@ -420,7 +450,9 @@ def update_pyproject_description(pyproject_path: Path, description: str) -> None
             )
         # If no description field exists, add it after the name field
         else:
-            content = content.replace('name = "', f'name = "\ndescription = "{escaped_description}"')
+            content = content.replace(
+                'name = "', f'name = "\ndescription = "{escaped_description}"'
+            )
 
         pyproject_path.write_text(content)
 
@@ -581,7 +613,9 @@ def init() -> None:
     project_path = Path(config["project_name"])
 
     if project_path.exists():
-        if not Confirm.ask(f"Directory {config['project_name']} already exists. Continue?"):
+        if not Confirm.ask(
+            f"Directory {config['project_name']} already exists. Continue?"
+        ):
             raise typer.Exit()
 
     # Run uv init
@@ -635,7 +669,9 @@ dev = [
 """
                 # Find the right spot to insert it (after [project] section)
                 if "[build-system]" in content:
-                    content = content.replace("[build-system]", dev_section + "\n[build-system]")
+                    content = content.replace(
+                        "[build-system]", dev_section + "\n[build-system]"
+                    )
                 else:
                     content += dev_section
 
@@ -644,7 +680,9 @@ dev = [
                 # Insert pytest into existing dev dependencies
                 import re
 
-                dev_pattern = r"(\[dependency-groups\]\s*\ndev\s*=\s*\[(?:[^\]]*\n)?)(\])"
+                dev_pattern = (
+                    r"(\[dependency-groups\]\s*\ndev\s*=\s*\[(?:[^\]]*\n)?)(\])"
+                )
                 content = re.sub(dev_pattern, r'\1    "pytest>=7.0.0",\n\2', content)
 
             pyproject_path.write_text(content)
@@ -679,7 +717,9 @@ dev = [
     if "precommit" in config["features"]:
         console.print("3. Set up pre-commit: pre-commit install")
     if "github" in config["features"]:
-        console.print("4. Initialize git repository: git init && git add . && git commit -m 'Initial commit'")
+        console.print(
+            "4. Initialize git repository: git init && git add . && git commit -m 'Initial commit'"
+        )
 
 
 if __name__ == "__main__":
