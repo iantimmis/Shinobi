@@ -29,6 +29,14 @@ build-backend = "hatchling.build"
 packages = ["shinobi"]
 
 [tool.ruff]
-line-length = 120
-target-version = "py39"
-select = ["E", "F", "B", "I"]
+line-length = 88
+target-version = "py312"
+fix = true
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]  # Example: ignore line length
+
+[tool.ruff.format]
+quote-style = "double"
+
