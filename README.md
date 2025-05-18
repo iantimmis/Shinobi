@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="images/shinobi.png">
+  <img src="images/shinobi.png" width="300">
   <p>Enhanced project initialization tool built on top of `uv`. Shinobi helps you set up Python projects with best practices and common tools pre-configured.</p>
 </div>
 
