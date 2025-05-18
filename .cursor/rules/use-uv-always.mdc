@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Always Use UV for Python
 
 This project uses `uv` as the Python package manager and environment tool. Follow these guidelines:
