@@ -39,4 +39,3 @@ ignore = ["E501"]  # Example: ignore line length
 
 [tool.ruff.format]
 quote-style = "double"
-

@@ -178,7 +178,12 @@ def create_cursor_rules(project_path: Path) -> None:
     cursor_dir = project_path / ".cursor" / "rules"
     cursor_dir.mkdir(parents=True, exist_ok=True)
 
-    rules_content = """# Always Use UV for Python
+    rules_content = """---
+description: Always Use UV for Python
+globs: 
+alwaysApply: true
+---
+# Always Use UV for Python
 
 This project uses `uv` as the Python package manager and environment tool. Follow these guidelines:
 
