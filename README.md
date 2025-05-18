@@ -47,11 +47,11 @@ Enhanced project initialization tool built on top of `uv`. Shinobi helps you set
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/{config["project_name"]}.git
-cd {config["project_name"]}
+git clone https://github.com/iantimmis/shinobi.git
+cd shinobi
 
 # Install dependencies
-uv pip install -e '.[dev]'
+uv sync
 
 # Set up pre-commit hooks (if enabled)
 uv run pre-commit install
@@ -62,7 +62,7 @@ uv run pre-commit install
 ### Project Structure
 
 ```
-{config["project_name"]}/
+shinobi/
 ├── src/
 │   └── main.py
 ├── tests/
@@ -75,7 +75,7 @@ uv run pre-commit install
 ### Running Tests
 
 ```bash
-pytest
+uv run pytest
 ```
 
 ### Code Quality
