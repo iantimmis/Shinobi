@@ -1,8 +1,6 @@
 <div align="center">
-<h1> Shinobi </h1>
-
-Enhanced project initialization tool built on top of `uv`. Shinobi helps you set up Python projects with best practices and common tools pre-configured.
-
+  <img src="images/shinobi.png">
+  <p>Enhanced project initialization tool built on top of `uv`. Shinobi helps you set up Python projects with best practices and common tools pre-configured.</p>
 </div>
 
 ---
