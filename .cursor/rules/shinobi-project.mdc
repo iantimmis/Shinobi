@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 # Shinobi Project Overview
@@ -61,4 +61,4 @@ This will:
 - Follow the established project structure
 - Use pre-commit hooks for code quality
 - Write tests for new features
-- Keep the codebase clean and well-documented 
+- Keep the codebase clean and well-documented
