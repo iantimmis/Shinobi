@@ -309,7 +309,7 @@ def get_project_config() -> Optional[dict]:
         github_url = ""
         if github_owner:
             github_repo = questionary.text(
-                f"What's your GitHub repository name? (leave empty to use '{project_name}')",
+                "What's your GitHub repository name?",
                 default=project_name,
             ).ask()
 
@@ -385,12 +385,11 @@ def create_readme(project_path: Path, config: dict) -> None:
     # Generate badges
     badges = []
 
-    # Add GitHub-specific badges if URL is provided
-    github_url = config.get("github_url")
+    # Add GitHub-specific badges if owner and repo are provided
     github_owner = config.get("github_owner")
     github_repo = config.get("github_repo")
 
-    if github_url and github_owner and github_repo:
+    if github_owner and github_repo:
         badges.append(
             f"[![Unit Tests](https://github.com/{github_owner}/{github_repo}/actions/workflows/test.yml/badge.svg)](https://github.com/{github_owner}/{github_repo}/actions/workflows/test.yml)"
         )
@@ -430,7 +429,7 @@ def create_readme(project_path: Path, config: dict) -> None:
 
 ```bash
 # Clone the repository
-git clone {github_url or f"https://github.com/yourusername/{config['project_name']}.git"}
+git clone {config.get("github_url") or f"https://github.com/yourusername/{config['project_name']}.git"}
 cd {config["project_name"]}
 
 # Install dependencies

@@ -25,6 +25,8 @@ def test_create_readme(project_path):
     config = {
         "project_name": "test-project",
         "description": "A test project",
+        "github_owner": "testuser",
+        "github_repo": "test-project",
     }
     create_readme(project_path, config)
 
@@ -35,6 +37,12 @@ def test_create_readme(project_path):
     assert "A test project" in content
     assert "## Features" in content
     assert "## Installation" in content
+    # Check for badges
+    assert "[![Unit Tests]" in content
+    assert "[![Ruff]" in content
+    assert "[![License: MIT]" in content
+    # Check for GitHub-specific content
+    assert "https://github.com/testuser/test-project" in content
 
 
 def test_create_license(project_path):
