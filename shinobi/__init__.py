@@ -1,3 +1,8 @@
 """Shinobi - Enhanced project initialization tool built on top of uv."""
 
-__version__ = "0.1.0"
+try:
+    from importlib.metadata import version
+except ImportError:
+    from importlib_metadata import version  # backport for Python <3.8
+
+__version__ = version("shinobi")
