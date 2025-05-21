@@ -44,6 +44,3 @@ quote-style = "double"
 pythonpath = ["."]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-
-[tool.uv.workspace]
-members = ["test-project"]
