@@ -129,50 +129,10 @@ def create_cursor_rules(project_path: Path) -> None:
     cursor_dir = project_path / ".cursor" / "rules"
     cursor_dir.mkdir(parents=True, exist_ok=True)
 
-    # Write the Cursor rules file directly
-    rules_content = """---
-description: Always Use UV for Python
-globs:
-alwaysApply: true
----
-# Always Use UV for Python
-
-This project uses `uv` as the Python package manager and environment tool. Follow these guidelines:
-
-## Package Management
-
-- To add new dependencies:
-  ```bash
-  uv add package_name
-  ```
-
-- To update the environment with dependencies from requirements.txt:
-  ```bash
-  uv sync
-  ```
-
-## Running Python Code
-
-- Always use `uv run` to execute Python files:
-  ```bash
-  uv run myfile.py
-  ```
-
-## Benefits of UV
-
-- Faster than pip
-- Better dependency resolution
-- Built-in virtual environment management
-
-## Common Commands
-
-- Install a package: `uv add package_name`
-- Update or install dependencies: `uv sync`
-- Run Python file: `uv run file.py`
-- Create new venv: `uv venv`
-"""
+    # Copy cursor rules from template
+    rules_source = TEMPLATES_DIR / "ide" / "cursor" / "rules" / "use-uv-always.mdc"
     rules_dest = cursor_dir / "use-uv-always.mdc"
-    rules_dest.write_text(rules_content)
+    shutil.copy(rules_source, rules_dest)
 
 
 def create_readme(project_path: Path, config: dict) -> None:
