@@ -712,6 +712,15 @@ dev = [
                 )
                 content = re.sub(dev_pattern, r'\1    "pytest>=7.0.0",\n\2', content)
 
+            # Add pytest configuration
+            pytest_config = """
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+"""
+            content += pytest_config
+
             pyproject_path.write_text(content)
 
         # Create a basic test file
