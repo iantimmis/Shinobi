@@ -2,7 +2,7 @@
 
 import pytest
 
-from shinobi.cli import validate_project_name
+from shinobi.validation.validators import validate_project_name
 
 
 @pytest.mark.parametrize(
