@@ -9,7 +9,10 @@ import typer
 from rich.console import Console
 from rich.prompt import Confirm
 
-app = typer.Typer()
+app = typer.Typer(
+    help="Shinobi - Enhanced Python project initialization tool.",
+    no_args_is_help=True,
+)
 console = Console()
 
 
@@ -691,6 +694,12 @@ def create_gitignore(project_path: Path) -> None:
         "# End of https://www.toptal.com/developers/gitignore/api/python"
     )
     (project_path / ".gitignore").write_text(gitignore_content)
+
+
+@app.callback()
+def callback():
+    """Shinobi CLI callback."""
+    pass
 
 
 @app.command()

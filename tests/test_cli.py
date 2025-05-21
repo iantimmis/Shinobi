@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from typer.testing import CliRunner  # Keep for other tests, if any
+from typer.testing import CliRunner
 
 from shinobi.cli import app
 from shinobi.cli import init as cli_init_func
@@ -21,7 +21,8 @@ def test_cli_help(runner):
     """Test that the CLI shows help text."""
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
-    assert "Usage" in result.stdout
+    assert "Shinobi - Enhanced Python project initialization tool" in result.stdout
+    assert "init" in result.stdout
 
 
 def test_cli_init_help(runner):
