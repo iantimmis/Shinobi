@@ -1,3 +1,5 @@
+# Shinobi
+
 <div align="center">
   <img src="images/shinobi.png" width="500">
   <p>Enhanced project initialization tool built on top of `uv`. Shinobi helps you set up Python projects with best practices and common tools pre-configured.</p>
@@ -8,11 +10,42 @@
 
 </div>
 
----
+Shinobi is an enhanced Python project initialization tool built on top of `uv`. It provides a streamlined way to create new Python projects with modern best practices and tooling.
 
-## ✨ Features
+## Installation
 
-### 🛠️ Project Structure
+```bash
+# Install Shinobi
+uv pip install shinobi
+```
+
+## Usage
+
+Shinobi provides a simple CLI interface for initializing new Python projects:
+
+```bash
+# Show help
+shinobi
+
+# Initialize a new project
+shinobi init
+
+# Show help for init command
+shinobi init --help
+```
+
+When you run `shinobi init`, you'll be guided through an interactive setup process that includes:
+
+1. Project name and description
+2. GitHub repository details (optional)
+3. Python version selection
+4. IDE preference (VS Code or Cursor)
+5. Additional features:
+   - GitHub Actions workflows
+   - Pre-commit hooks with Ruff
+   - Pytest setup
+
+## Features
 
 - Modern Python project structure with `src` layout
 - Comprehensive test suite with pytest
@@ -46,34 +79,23 @@
   - Ruff linting
   - Ruff formatting
 
-## Installation
+## Project Structure
 
-```bash
-# Clone the repository
-git clone https://github.com/iantimmis/shinobi.git
-cd shinobi
-
-# Install dependencies
-uv sync
-
-# Set up pre-commit hooks (if enabled)
-uv run pre-commit install
+```
+project_name/
+├── src/              # Source code directory
+│   └── main.py      # Main application code
+├── tests/           # Test directory
+│   └── __init__.py
+├── .github/         # GitHub Actions workflows
+├── .vscode/         # VS Code settings
+├── .cursor/         # Cursor rules
+├── .pre-commit-config.yaml
+├── pyproject.toml   # Project configuration
+└── README.md
 ```
 
 ## Development
-
-### Project Structure
-
-```
-shinobi/
-├── src/
-│   └── main.py
-├── tests/
-│   └── __init__.py
-├── .pre-commit-config.yaml
-├── pyproject.toml
-└── README.md
-```
 
 ### Running Tests
 
@@ -87,10 +109,10 @@ This project uses Ruff for linting and formatting. To run the checks:
 
 ```bash
 # Lint
-uvx ruff check
+uv run ruff check
 
 # Format
-uvx ruff format
+uv run ruff format
 ```
 
 ## License
