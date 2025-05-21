@@ -30,6 +30,7 @@ def test_get_project_config(mock_questionary_fixture):
     mock_questionary_fixture.text.return_value.ask.side_effect = [
         "test-project",  # Project name
         "A test project",  # Description
+        "",  # GitHub owner (optional, empty)
     ]
     mock_questionary_fixture.select.return_value.ask.side_effect = [
         "3.11",  # Python version
@@ -48,9 +49,12 @@ def test_get_project_config(mock_questionary_fixture):
     assert config["python_version"] == "3.11"
     assert config["ide"] == "VS Code"
     assert config["features"] == ["precommit", "github", "pytest"]
+    assert config.get("github_url") == ""
+    assert config.get("github_owner") == ""
+    assert config.get("github_repo") == ""
 
     # Verify questionary calls
-    assert mock_questionary_fixture.text.call_count == 2
+    assert mock_questionary_fixture.text.call_count == 3
     assert mock_questionary_fixture.select.call_count == 2
     assert mock_questionary_fixture.checkbox.call_count == 1
 
@@ -58,12 +62,15 @@ def test_get_project_config(mock_questionary_fixture):
 def test_get_project_config_minimal(mock_questionary_fixture):
     """Test project configuration with minimal features."""
     mock_questionary_fixture.text.return_value.ask.side_effect = [
-        "minimal-project", # Project name
-        "Minimal description", # Description
+        "minimal-project",  # Project name
+        "Minimal description",  # Description
+        "",  # GitHub URL (optional)
+        "",  # GitHub owner (optional)
+        "",  # GitHub repo (optional)
     ]
     mock_questionary_fixture.select.return_value.ask.side_effect = [
-        "3.10", # Python version
-        "None", # IDE
+        "3.10",  # Python version
+        "None",  # IDE
     ]
     mock_questionary_fixture.checkbox.return_value.ask.return_value = []  # No features
 
@@ -74,17 +81,23 @@ def test_get_project_config_minimal(mock_questionary_fixture):
     assert config["python_version"] == "3.10"
     assert config["ide"] == "None"
     assert config["features"] == []
+    assert config.get("github_url") == ""
+    assert config.get("github_owner") == ""
+    assert config.get("github_repo") == ""
 
 
 def test_get_project_config_cursor_ide(mock_questionary_fixture):
     """Test project configuration with Cursor IDE."""
     mock_questionary_fixture.text.return_value.ask.side_effect = [
-        "cursor-project", # Project name
-        "Cursor project description", # Description
+        "cursor-project",  # Project name
+        "Cursor project description",  # Description
+        "",  # GitHub URL (optional)
+        "",  # GitHub owner (optional)
+        "",  # GitHub repo (optional)
     ]
     mock_questionary_fixture.select.return_value.ask.side_effect = [
-        "3.9", # Python version
-        "Cursor", # IDE
+        "3.9",  # Python version
+        "Cursor",  # IDE
     ]
     mock_questionary_fixture.checkbox.return_value.ask.return_value = [
         "precommit",
@@ -98,3 +111,6 @@ def test_get_project_config_cursor_ide(mock_questionary_fixture):
     assert config["python_version"] == "3.9"
     assert config["ide"] == "Cursor"
     assert config["features"] == ["precommit", "pytest"]
+    assert config.get("github_url") == ""
+    assert config.get("github_owner") == ""
+    assert config.get("github_repo") == ""
