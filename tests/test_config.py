@@ -1,41 +1,46 @@
 """Test cases for project configuration."""
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
-from questionary import Question
 
 from shinobi.cli import get_project_config
 
 
 @pytest.fixture
-def mock_questionary():
-    """Mock questionary responses."""
-    with patch("shinobi.cli.questionary") as mock:
-        # Mock text input for project name
-        mock.text.return_value = Question.ask = lambda: "test-project"
+def mock_questionary_fixture():
+    """Mocks questionary and its methods with unique MagicMock instances for .ask()."""
+    with patch("shinobi.cli.questionary") as mock_q_module:
+        # Each call to text, select, checkbox returns a new mock object (mock_text_prompt, etc.)
+        # This new mock object then has its 'ask' method mocked.
+        mock_text_prompt = MagicMock()
+        mock_q_module.text.return_value = mock_text_prompt
 
-        # Mock text input for description
-        mock.text.return_value = Question.ask = lambda: "A test project"
+        mock_select_prompt = MagicMock()
+        mock_q_module.select.return_value = mock_select_prompt
 
-        # Mock select for Python version
-        mock.select.return_value = Question.ask = lambda: "3.11"
-
-        # Mock select for IDE
-        mock.select.return_value = Question.ask = lambda: "VS Code"
-
-        # Mock checkbox for features
-        mock.checkbox.return_value = Question.ask = lambda: [
-            "precommit",
-            "github",
-            "pytest",
-        ]
-
-        yield mock
+        mock_checkbox_prompt = MagicMock()
+        mock_q_module.checkbox.return_value = mock_checkbox_prompt
+        yield mock_q_module
 
 
-def test_get_project_config(mock_questionary):
+def test_get_project_config(mock_questionary_fixture):
     """Test project configuration gathering."""
+    # Configure side effects for each .ask() call on the respective prompt mock
+    mock_questionary_fixture.text.return_value.ask.side_effect = [
+        "test-project",  # Project name
+        "A test project",  # Description
+    ]
+    mock_questionary_fixture.select.return_value.ask.side_effect = [
+        "3.11",  # Python version
+        "VS Code",  # IDE
+    ]
+    mock_questionary_fixture.checkbox.return_value.ask.return_value = [
+        "precommit",
+        "github",
+        "pytest",
+    ]
+
     config = get_project_config()
 
     assert config["project_name"] == "test-project"
@@ -45,31 +50,51 @@ def test_get_project_config(mock_questionary):
     assert config["features"] == ["precommit", "github", "pytest"]
 
     # Verify questionary calls
-    mock_questionary.text.assert_called()
-    mock_questionary.select.assert_called()
-    mock_questionary.checkbox.assert_called()
+    assert mock_questionary_fixture.text.call_count == 2
+    assert mock_questionary_fixture.select.call_count == 2
+    assert mock_questionary_fixture.checkbox.call_count == 1
 
 
-def test_get_project_config_minimal(mock_questionary):
+def test_get_project_config_minimal(mock_questionary_fixture):
     """Test project configuration with minimal features."""
-    # Override checkbox response
-    mock_questionary.checkbox.return_value = Question.ask = lambda: []
+    mock_questionary_fixture.text.return_value.ask.side_effect = [
+        "minimal-project", # Project name
+        "Minimal description", # Description
+    ]
+    mock_questionary_fixture.select.return_value.ask.side_effect = [
+        "3.10", # Python version
+        "None", # IDE
+    ]
+    mock_questionary_fixture.checkbox.return_value.ask.return_value = []  # No features
 
     config = get_project_config()
 
-    assert config["project_name"] == "test-project"
-    assert config["description"] == "A test project"
-    assert config["python_version"] == "3.11"
-    assert config["ide"] == "VS Code"
+    assert config["project_name"] == "minimal-project"
+    assert config["description"] == "Minimal description"
+    assert config["python_version"] == "3.10"
+    assert config["ide"] == "None"
     assert config["features"] == []
 
 
-def test_get_project_config_cursor_ide(mock_questionary):
+def test_get_project_config_cursor_ide(mock_questionary_fixture):
     """Test project configuration with Cursor IDE."""
-    # Override IDE selection
-    mock_questionary.select.return_value = Question.ask = lambda: "Cursor"
+    mock_questionary_fixture.text.return_value.ask.side_effect = [
+        "cursor-project", # Project name
+        "Cursor project description", # Description
+    ]
+    mock_questionary_fixture.select.return_value.ask.side_effect = [
+        "3.9", # Python version
+        "Cursor", # IDE
+    ]
+    mock_questionary_fixture.checkbox.return_value.ask.return_value = [
+        "precommit",
+        "pytest",
+    ]  # Example features
 
     config = get_project_config()
 
+    assert config["project_name"] == "cursor-project"
+    assert config["description"] == "Cursor project description"
+    assert config["python_version"] == "3.9"
     assert config["ide"] == "Cursor"
-    assert config["features"] == ["precommit", "github", "pytest"]
+    assert config["features"] == ["precommit", "pytest"]
