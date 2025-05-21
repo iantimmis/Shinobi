@@ -5,9 +5,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from typer.testing import CliRunner # Keep for other tests, if any
+from typer.testing import CliRunner  # Keep for other tests, if any
 
-from shinobi.cli import app, init as cli_init_func
+from shinobi.cli import app
+from shinobi.cli import init as cli_init_func
 
 
 @pytest.fixture
@@ -30,7 +31,7 @@ def test_cli_init_help(runner):
     assert "Initialize a new Python project" in result.stdout
 
 
-def test_cli_init_basic(tmp_path): # Removed runner
+def test_cli_init_basic(tmp_path):  # Removed runner
     """Test basic project initialization by calling init() directly."""
     with patch("shinobi.cli.get_project_config") as mock_config:
         mock_config.return_value = {
@@ -60,12 +61,18 @@ build-backend = "hatchling.build"
 """
         (main_project_dir / "pyproject.toml").write_text(dummy_pyproject_content)
 
-        with patch("shinobi.cli.run_command") as mock_run, \
-             patch("shinobi.cli.Confirm.ask") as mock_confirm_ask:
-            mock_confirm_ask.return_value = True # Ensure Confirm.ask doesn't try to read stdin
+        with (
+            patch("shinobi.cli.run_command") as mock_run,
+            patch("shinobi.cli.Confirm.ask") as mock_confirm_ask,
+        ):
+            mock_confirm_ask.return_value = (
+                True  # Ensure Confirm.ask doesn't try to read stdin
+            )
             original_cwd = Path.cwd()
             try:
-                os.chdir(tmp_path) # shinobi.cli.init() expects to be in the parent of project_name_val
+                os.chdir(
+                    tmp_path
+                )  # shinobi.cli.init() expects to be in the parent of project_name_val
                 # Call the init function directly
                 cli_init_func()
             finally:
@@ -85,8 +92,12 @@ build-backend = "hatchling.build"
             assert (created_project_path / "LICENSE").is_file()
 
             # Check that GitHub workflows were created
-            assert (created_project_path / ".github" / "workflows" / "lint.yml").is_file()
-            assert (created_project_path / ".github" / "workflows" / "test.yml").is_file()
+            assert (
+                created_project_path / ".github" / "workflows" / "lint.yml"
+            ).is_file()
+            assert (
+                created_project_path / ".github" / "workflows" / "test.yml"
+            ).is_file()
 
             # Check that VS Code settings were created
             assert (created_project_path / ".vscode" / "settings.json").is_file()

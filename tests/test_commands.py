@@ -33,11 +33,15 @@ def test_run_command_pip_conversion():
 
         # Test direct pip command
         run_command(["pip", "install", "package"])
-        mock_run.assert_called_with(["uv", "pip", "install", "package"], check=True, cwd=None)
+        mock_run.assert_called_with(
+            ["uv", "pip", "install", "package"], check=True, cwd=None
+        )
 
         # Test python -m pip command
         run_command(["python", "-m", "pip", "install", "package"])
-        mock_run.assert_called_with(["uv", "pip", "install", "package"], check=True, cwd=None)
+        mock_run.assert_called_with(
+            ["uv", "pip", "install", "package"], check=True, cwd=None
+        )
 
 
 def test_run_command_with_cwd():

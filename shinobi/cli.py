@@ -32,12 +32,27 @@ def setup_ruff(project_path: Path) -> None:
     """Set up Ruff configuration and pre-commit hook."""
     # Create .pre-commit-config.yaml
     pre_commit_config = """repos:
--   repo: https://github.com/astral-sh/ruff-pre-commit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.3.0
     hooks:
-    -   id: ruff
+      - id: ruff
         args: [--fix]
-    -   id: ruff-format
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
 """
     (project_path / ".pre-commit-config.yaml").write_text(pre_commit_config)
 
@@ -180,7 +195,7 @@ def create_cursor_rules(project_path: Path) -> None:
 
     rules_content = """---
 description: Always Use UV for Python
-globs: 
+globs:
 alwaysApply: true
 ---
 # Always Use UV for Python
@@ -281,6 +296,28 @@ def get_project_config() -> Optional[dict]:
         if description is None:  # User pressed Ctrl+C
             return None
 
+        # Get GitHub repository details
+        github_owner = questionary.text(
+            "What's your GitHub username or organization name? (leave empty if not using GitHub)",
+            default="",
+        ).ask()
+
+        if github_owner is None:  # User pressed Ctrl+C
+            return None
+
+        github_repo = ""
+        github_url = ""
+        if github_owner:
+            github_repo = questionary.text(
+                f"What's your GitHub repository name? (leave empty to use '{project_name}')",
+                default=project_name,
+            ).ask()
+
+            if github_repo is None:  # User pressed Ctrl+C
+                return None
+
+            github_url = f"https://github.com/{github_owner}/{github_repo}"
+
         # Get Python version
         python_version = questionary.select(
             "Which Python version would you like to use?",
@@ -335,6 +372,9 @@ def get_project_config() -> Optional[dict]:
             "python_version": python_version,
             "ide": ide,
             "features": features,
+            "github_url": github_url,
+            "github_owner": github_owner,
+            "github_repo": github_repo,
         }
     except KeyboardInterrupt:
         return None
@@ -342,10 +382,35 @@ def get_project_config() -> Optional[dict]:
 
 def create_readme(project_path: Path, config: dict) -> None:
     """Create a comprehensive README.md file for the project."""
+    # Generate badges
+    badges = []
+
+    # Add GitHub-specific badges if URL is provided
+    github_url = config.get("github_url")
+    github_owner = config.get("github_owner")
+    github_repo = config.get("github_repo")
+
+    if github_url and github_owner and github_repo:
+        badges.append(
+            f"[![Unit Tests](https://github.com/{github_owner}/{github_repo}/actions/workflows/test.yml/badge.svg)](https://github.com/{github_owner}/{github_repo}/actions/workflows/test.yml)"
+        )
+
+    # Always include these badges
+    badges.append(
+        "[![Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)"
+    )
+    badges.append(
+        "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)"
+    )
+
+    badges_section = "\n".join(badges)
+
     readme_content = f"""<div align="center">
 <h1> {config["project_name"]} </h1>
 
 {config["description"] or "A Python project initialized with Shinobi."}
+
+{badges_section}
 
 </div>
 
@@ -365,7 +430,7 @@ def create_readme(project_path: Path, config: dict) -> None:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/{config["project_name"]}.git
+git clone {github_url or f"https://github.com/yourusername/{config['project_name']}.git"}
 cd {config["project_name"]}
 
 # Install dependencies
