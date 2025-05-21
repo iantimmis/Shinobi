@@ -245,81 +245,99 @@ def validate_project_name(name: str) -> tuple[bool, str]:
     return True, ""
 
 
-def get_project_config() -> dict:
+def get_project_config() -> Optional[dict]:
     """Get project configuration through interactive prompts."""
     console.print(
         "\n[bold blue]Welcome to Shinobi! Let's set up your project.[/bold blue]\n"
     )
 
-    # Get project name with validation
-    while True:
-        project_name = questionary.text(
-            "What's the name of your project?",
-            validate=lambda text: len(text) > 0,
+    try:
+        # Get project name with validation
+        while True:
+            project_name = questionary.text(
+                "What's the name of your project?",
+                validate=lambda text: len(text) > 0,
+            ).ask()
+
+            if project_name is None:  # User pressed Ctrl+C
+                return None
+
+            is_valid, error_msg = validate_project_name(project_name)
+            if is_valid:
+                break
+
+            console.print(f"[red]Invalid project name: {error_msg}[/red]")
+            console.print("[yellow]Project names must:[/yellow]")
+            console.print("- Start and end with a letter or digit")
+            console.print("- May only contain letters, digits, '-', '_', and '.'")
+            console.print("Please try again.\n")
+
+        # Get project description
+        description = questionary.text(
+            "What's the description of your project?",
+            default="",
         ).ask()
 
-        is_valid, error_msg = validate_project_name(project_name)
-        if is_valid:
-            break
+        if description is None:  # User pressed Ctrl+C
+            return None
 
-        console.print(f"[red]Invalid project name: {error_msg}[/red]")
-        console.print("[yellow]Project names must:[/yellow]")
-        console.print("- Start and end with a letter or digit")
-        console.print("- May only contain letters, digits, '-', '_', and '.'")
-        console.print("Please try again.\n")
+        # Get Python version
+        python_version = questionary.select(
+            "Which Python version would you like to use?",
+            choices=["3.13", "3.12", "3.11"],
+            default="3.13",
+        ).ask()
 
-    # Get project description
-    description = questionary.text(
-        "What's the description of your project?",
-        default="",
-    ).ask()
+        if python_version is None:  # User pressed Ctrl+C
+            return None
 
-    # Get Python version
-    python_version = questionary.select(
-        "Which Python version would you like to use?",
-        choices=["3.13", "3.12", "3.11"],
-        default="3.13",
-    ).ask()
+        # Get IDE preference
+        ide = questionary.select(
+            "Which IDE are you using?",
+            choices=["Cursor", "VS Code", "Other"],
+            default="VS Code",
+        ).ask()
 
-    # Get IDE preference
-    ide = questionary.select(
-        "Which IDE are you using?",
-        choices=["Cursor", "VS Code", "Other"],
-        default="VS Code",
-    ).ask()
+        if ide is None:  # User pressed Ctrl+C
+            return None
 
-    # Get additional features
-    features = questionary.checkbox(
-        "Select additional features to include:",
-        choices=[
-            {
-                "name": "GitHub Actions",
-                "value": "github",
-                "checked": True,
-                "description": "Set up GitHub Actions workflows for linting and testing",
-            },
-            {
-                "name": "Pre-commit hooks",
-                "value": "precommit",
-                "checked": True,
-                "description": "Set up pre-commit hooks for Ruff",
-            },
-            {
-                "name": "Pytest",
-                "value": "pytest",
-                "checked": True,
-                "description": "Set up pytest for testing",
-            },
-        ],
-    ).ask()
+        # Get additional features
+        features = questionary.checkbox(
+            "Select additional features to include:",
+            choices=[
+                {
+                    "name": "GitHub Actions",
+                    "value": "github",
+                    "checked": True,
+                    "description": "Set up GitHub Actions workflows for linting and testing",
+                },
+                {
+                    "name": "Pre-commit hooks",
+                    "value": "precommit",
+                    "checked": True,
+                    "description": "Set up pre-commit hooks for Ruff",
+                },
+                {
+                    "name": "Pytest",
+                    "value": "pytest",
+                    "checked": True,
+                    "description": "Set up pytest for testing",
+                },
+            ],
+        ).ask()
 
-    return {
-        "project_name": project_name,
-        "description": description,
-        "python_version": python_version,
-        "ide": ide,
-        "features": features,
-    }
+        if features is None:  # User pressed Ctrl+C
+            return None
+
+        return {
+            "project_name": project_name,
+            "description": description,
+            "python_version": python_version,
+            "ide": ide,
+            "features": features,
+        }
+    except KeyboardInterrupt:
+        return None
 
 
 def create_readme(project_path: Path, config: dict) -> None:
@@ -615,6 +633,10 @@ def create_gitignore(project_path: Path) -> None:
 def init() -> None:
     """Initialize a new Python project with enhanced features."""
     config = get_project_config()
+    if config is None:
+        console.print("\n[yellow]Operation cancelled by user.[/yellow]")
+        raise typer.Exit(0)
+
     project_path = Path(config["project_name"])
 
     if project_path.exists():
