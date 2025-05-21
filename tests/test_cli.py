@@ -40,6 +40,8 @@ def test_cli_init_basic(tmp_path):  # Removed runner
             "python_version": "3.11",
             "ide": "VS Code",
             "features": ["precommit", "github", "pytest"],
+            "github_owner": "testuser",
+            "github_repo": "test-project",
         }
         project_name_val = mock_config.return_value["project_name"]
 
@@ -101,3 +103,8 @@ build-backend = "hatchling.build"
 
             # Check that VS Code settings were created
             assert (created_project_path / ".vscode" / "settings.json").is_file()
+
+            # Check README content
+            readme_content = (created_project_path / "README.md").read_text()
+            assert "[![Unit Tests]" in readme_content
+            assert "https://github.com/testuser/test-project" in readme_content
