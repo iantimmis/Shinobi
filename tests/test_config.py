@@ -4,13 +4,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from shinobi.cli import get_project_config
+from shinobi.config.project_config import get_project_config
 
 
 @pytest.fixture
 def mock_questionary_fixture():
     """Mocks questionary and its methods with unique MagicMock instances for .ask()."""
-    with patch("shinobi.cli.questionary") as mock_q_module:
+    with patch("shinobi.config.project_config.questionary") as mock_q_module:
         # Each call to text, select, checkbox returns a new mock object (mock_text_prompt, etc.)
         # This new mock object then has its 'ask' method mocked.
         mock_text_prompt = MagicMock()
