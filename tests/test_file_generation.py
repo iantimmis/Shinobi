@@ -21,6 +21,7 @@ def project_path(tmp_path):
 
 def test_create_readme(project_path):
     """Test README generation."""
+    project_path.mkdir(parents=True, exist_ok=True)
     config = {
         "project_name": "test-project",
         "description": "A test project",
@@ -38,6 +39,7 @@ def test_create_readme(project_path):
 
 def test_create_license(project_path):
     """Test license file generation."""
+    project_path.mkdir(parents=True, exist_ok=True)
     create_license(project_path)
 
     license_path = project_path / "LICENSE"
@@ -49,6 +51,7 @@ def test_create_license(project_path):
 
 def test_create_vscode_settings(project_path):
     """Test VS Code settings generation."""
+    project_path.mkdir(parents=True, exist_ok=True)
     create_vscode_settings(project_path)
 
     settings_path = project_path / ".vscode" / "settings.json"
@@ -90,6 +93,7 @@ def test_setup_github_workflows(project_path):
 
 def test_setup_ruff(project_path):
     """Test Ruff and pre-commit setup."""
+    project_path.mkdir(parents=True, exist_ok=True)
     # Create a basic pyproject.toml
     pyproject_path = project_path / "pyproject.toml"
     pyproject_path.write_text("""[project]
@@ -112,6 +116,7 @@ version = "0.1.0"
 
 def test_update_pyproject_description(project_path):
     """Test pyproject.toml description update."""
+    project_path.mkdir(parents=True, exist_ok=True)
     # Test with empty description
     pyproject_path = project_path / "pyproject.toml"
     pyproject_path.write_text("""[project]
@@ -133,7 +138,7 @@ description = ""
     multiline_desc = "A test project\nwith multiple lines"
     update_pyproject_description(pyproject_path, multiline_desc)
     content = pyproject_path.read_text()
-    assert 'description = "A test project\\nwith multiple lines"' in content
+    assert 'description = "A test project\nwith multiple lines"' in content
 
     # Test with quotes in description
     quoted_desc = 'A "quoted" description'

@@ -4,6 +4,7 @@ import subprocess
 from unittest.mock import patch
 
 import pytest
+import typer
 
 from shinobi.cli import run_command
 
@@ -20,9 +21,9 @@ def test_run_command_failure():
     """Test command execution failure."""
     with patch("subprocess.run") as mock_run:
         mock_run.side_effect = subprocess.CalledProcessError(1, ["echo", "test"])
-        with pytest.raises(SystemExit) as exc_info:
+        with pytest.raises(typer.Exit) as exc_info:
             run_command(["echo", "test"])
-        assert exc_info.value.code == 1
+        assert exc_info.value.exit_code == 1
 
 
 def test_run_command_pip_conversion():

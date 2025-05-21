@@ -1,12 +1,13 @@
 """Test cases for the shinobi CLI."""
 
+import os
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from typer.testing import CliRunner
+from typer.testing import CliRunner # Keep for other tests, if any
 
-from shinobi.cli import app
+from shinobi.cli import app, init as cli_init_func
 
 
 @pytest.fixture
@@ -29,8 +30,8 @@ def test_cli_init_help(runner):
     assert "Initialize a new Python project" in result.stdout
 
 
-def test_cli_init_basic(runner, tmp_path):
-    """Test basic project initialization."""
+def test_cli_init_basic(tmp_path): # Removed runner
+    """Test basic project initialization by calling init() directly."""
     with patch("shinobi.cli.get_project_config") as mock_config:
         mock_config.return_value = {
             "project_name": "test-project",
@@ -39,29 +40,53 @@ def test_cli_init_basic(runner, tmp_path):
             "ide": "VS Code",
             "features": ["precommit", "github", "pytest"],
         }
+        project_name_val = mock_config.return_value["project_name"]
 
-        with patch("shinobi.cli.run_command") as mock_run:
-            result = runner.invoke(app, ["init"])
-            assert result.exit_code == 0
+        # Create the main project directory first
+        main_project_dir = tmp_path / project_name_val
+        main_project_dir.mkdir()
 
-            # Check that uv init was called
-            mock_run.assert_any_call(["uv", "init", "test-project"])
+        # Create a dummy pyproject.toml that 'uv init' would have created
+        dummy_pyproject_content = f"""
+[project]
+name = "{project_name_val}"
+version = "0.1.0"
+description = ""
+requires-python = ">=3.8"
 
-            # Check that project structure was created
-            project_path = Path("test-project")
-            assert project_path.exists()
-            assert (project_path / "src").exists()
-            assert (project_path / "tests").exists()
-            assert (project_path / "pyproject.toml").exists()
-            assert (project_path / "README.md").exists()
-            assert (project_path / "LICENSE").exists()
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+"""
+        (main_project_dir / "pyproject.toml").write_text(dummy_pyproject_content)
+
+        with patch("shinobi.cli.run_command") as mock_run, \
+             patch("shinobi.cli.Confirm.ask") as mock_confirm_ask:
+            mock_confirm_ask.return_value = True # Ensure Confirm.ask doesn't try to read stdin
+            original_cwd = Path.cwd()
+            try:
+                os.chdir(tmp_path) # shinobi.cli.init() expects to be in the parent of project_name_val
+                # Call the init function directly
+                cli_init_func()
+            finally:
+                os.chdir(original_cwd)
+
+            # Check that uv init was called with correct project name relative to tmp_path
+            # The init command creates the project dir inside the CWD (which is tmp_path)
+            mock_run.assert_any_call(["uv", "init", project_name_val])
+
+            # Check that project structure was created relative to tmp_path
+            created_project_path = tmp_path / project_name_val
+            assert created_project_path.is_dir()
+            assert (created_project_path / "src").is_dir()
+            assert (created_project_path / "tests").is_dir()
+            assert (created_project_path / "pyproject.toml").is_file()
+            assert (created_project_path / "README.md").is_file()
+            assert (created_project_path / "LICENSE").is_file()
 
             # Check that GitHub workflows were created
-            assert (project_path / ".github" / "workflows" / "lint.yml").exists()
-            assert (project_path / ".github" / "workflows" / "test.yml").exists()
+            assert (created_project_path / ".github" / "workflows" / "lint.yml").is_file()
+            assert (created_project_path / ".github" / "workflows" / "test.yml").is_file()
 
             # Check that VS Code settings were created
-            assert (project_path / ".vscode" / "settings.json").exists()
-
-            # Clean up
-            project_path.rmdir()
+            assert (created_project_path / ".vscode" / "settings.json").is_file()
