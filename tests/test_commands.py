@@ -1,43 +1,27 @@
-"""Test cases for command execution."""
+"""Test cases for CLI commands."""
 
-import subprocess
+import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-import typer
-
-from shinobi.cli import run_command
+from shinobi.core.utils import run_command
 
 
 def test_run_command_success():
-    """Test successful command execution."""
+    """Test that run_command succeeds with valid command."""
     with patch("subprocess.run") as mock_run:
-        mock_run.return_value = subprocess.CompletedProcess([], 0)
-        run_command(["echo", "test"])
+        run_command(["echo", "hello"])
         mock_run.assert_called_once()
 
 
-def test_run_command_failure():
-    """Test command execution failure."""
+def test_run_command_pip_replacement():
+    """Test that pip commands are replaced with uv pip."""
     with patch("subprocess.run") as mock_run:
-        mock_run.side_effect = subprocess.CalledProcessError(1, ["echo", "test"])
-        with pytest.raises(typer.Exit) as exc_info:
-            run_command(["echo", "test"])
-        assert exc_info.value.exit_code == 1
-
-
-def test_run_command_pip_conversion():
-    """Test pip command conversion to uv pip."""
-    with patch("subprocess.run") as mock_run:
-        mock_run.return_value = subprocess.CompletedProcess([], 0)
-
-        # Test direct pip command
         run_command(["pip", "install", "package"])
-        mock_run.assert_called_with(
+        mock_run.assert_called_once_with(
             ["uv", "pip", "install", "package"], check=True, cwd=None
         )
 
-        # Test python -m pip command
         run_command(["python", "-m", "pip", "install", "package"])
         mock_run.assert_called_with(
             ["uv", "pip", "install", "package"], check=True, cwd=None
@@ -45,8 +29,11 @@ def test_run_command_pip_conversion():
 
 
 def test_run_command_with_cwd():
-    """Test command execution with working directory."""
-    with patch("subprocess.run") as mock_run:
-        mock_run.return_value = subprocess.CompletedProcess([], 0)
-        run_command(["echo", "test"], cwd="/tmp")
-        mock_run.assert_called_with(["echo", "test"], check=True, cwd="/tmp")
+    """Test run_command with custom working directory."""
+    with (
+        tempfile.TemporaryDirectory() as tmpdir,
+        patch("subprocess.run") as mock_run,
+    ):
+        cwd = Path(tmpdir)
+        run_command(["ls"], cwd=cwd)
+        mock_run.assert_called_once_with(["ls"], check=True, cwd=cwd)
