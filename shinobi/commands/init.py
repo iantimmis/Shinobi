@@ -119,6 +119,11 @@ def create_vscode_settings(project_path: Path) -> None:
     settings_dest = vscode_dir / "settings.json"
     shutil.copy(settings_source, settings_dest)
 
+    # Copy extensions.json
+    extensions_source = TEMPLATES_DIR / "ide" / "vscode" / "extensions.json"
+    extensions_dest = vscode_dir / "extensions.json"
+    shutil.copy(extensions_source, extensions_dest)
+
 
 def create_cursor_rules(project_path: Path) -> None:
     """Create Cursor rules file.
