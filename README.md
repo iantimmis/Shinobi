@@ -10,13 +10,11 @@
 
 </div>
 
-Shinobi is an enhanced Python project initialization tool built on top of `uv`. It provides a streamlined way to create new Python projects with modern best practices and tooling.
-
 ## Installation
 
 ```bash
 # Install Shinobi
-uv pip install shinobi
+Will soon deploy to pip
 ```
 
 ## Usage
@@ -51,6 +49,7 @@ When you run `shinobi init`, you'll be guided through an interactive setup proce
 - Comprehensive test suite with pytest
 - Optimized Python `.gitignore` from Toptal
 - MIT License template
+- Interactive project configuration with questionary
 
 ### 📦 Dependency Management
 
@@ -88,6 +87,7 @@ project_name/
 ├── tests/           # Test directory
 │   └── __init__.py
 ├── .github/         # GitHub Actions workflows
+│   └── workflows/   # CI/CD workflows
 ├── .vscode/         # VS Code settings
 ├── .cursor/         # Cursor rules
 ├── .pre-commit-config.yaml
@@ -109,10 +109,33 @@ This project uses Ruff for linting and formatting. To run the checks:
 
 ```bash
 # Lint
-uv run ruff check
+uvx ruff check
 
 # Format
-uv run ruff format
+uvx ruff format
+```
+
+### Adding Dependencies
+
+Always use `uv` for package management:
+
+```bash
+# Add a new dependency
+uv add package_name
+
+# Add a development dependency
+uv add --dev package_name
+
+# Update dependencies from requirements
+uv sync
+```
+
+### Running Python Files
+
+Always use `uv run` to execute Python files:
+
+```bash
+uv run file.py
 ```
 
 ## License

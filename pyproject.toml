@@ -2,7 +2,10 @@
 name = "shinobi"
 version = "0.1.0"
 description = "Enhanced project initialization tool built on top of uv"
-authors = []
+authors = [
+  { name = "Ian Timmis" }
+]
+license = { text = "MIT" }
 dependencies = [
     "typer>=0.9.0",
     "rich>=13.7.0",
