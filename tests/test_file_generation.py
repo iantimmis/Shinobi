@@ -58,7 +58,7 @@ def test_create_license(project_path):
 
 
 def test_create_vscode_settings(project_path):
-    """Test VS Code settings generation."""
+    """Test VS Code settings.json generation."""
     project_path.mkdir(parents=True, exist_ok=True)
     create_vscode_settings(project_path)
 
@@ -67,6 +67,38 @@ def test_create_vscode_settings(project_path):
     content = settings_path.read_text()
     assert '"editor.formatOnSave"' in content
     assert '"charliermarsh.ruff"' in content
+    assert '"editor.codeActionsOnSave"' in content
+    assert '"source.fixAll"' in content
+    assert '"source.organizeImports"' in content
+
+
+def test_create_vscode_extensions(project_path):
+    """Test VS Code extensions.json generation."""
+    project_path.mkdir(parents=True, exist_ok=True)
+    create_vscode_settings(project_path)
+
+    extensions_path = project_path / ".vscode" / "extensions.json"
+    assert extensions_path.exists()
+    content = extensions_path.read_text().strip()  # Remove trailing whitespace
+
+    # Check JSON structure
+    assert content.startswith("{")
+    assert content.endswith("}")
+    assert '"recommendations"' in content
+
+    # Check all required extensions are present
+    required_extensions = [
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "ms-python.mypy-type-checker",
+        "ms-toolsai.jupyter",
+    ]
+    for extension in required_extensions:
+        assert f'"{extension}"' in content
+
+    # Verify the extensions are in an array
+    assert content.count("[") == 1  # One opening bracket for the array
+    assert content.count("]") == 1  # One closing bracket for the array
 
 
 def test_create_cursor_rules(project_path):
