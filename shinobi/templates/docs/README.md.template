@@ -13,10 +13,10 @@
 
 - Modern Python project structure with `src` layout
 - Dependency management with `uv`
+- Built-in testing with pytest
 - Code quality tools:
   - Ruff for linting and formatting
   - Pre-commit hooks for automated checks
-- Testing with pytest
 - GitHub Actions workflows for CI/CD
 - IDE support for VS Code and Cursor
 
