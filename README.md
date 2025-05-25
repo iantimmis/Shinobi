@@ -45,7 +45,7 @@ When you run `shinobi init`, you'll be guided through an interactive setup proce
 ## Features
 
 - Modern Python project structure with `src` layout
-- Built-in testing with pytest (always included)
+- Built-in testing with pytest
 - Optimized Python `.gitignore` from Toptal
 - MIT License template
 - Interactive project configuration with questionary
