@@ -106,12 +106,6 @@ def get_project_config() -> Optional[dict]:
                     "checked": True,
                     "description": "Set up pre-commit hooks for Ruff",
                 },
-                {
-                    "name": "Pytest",
-                    "value": "pytest",
-                    "checked": True,
-                    "description": "Set up pytest for testing",
-                },
             ],
         ).ask()
 

@@ -41,12 +41,11 @@ When you run `shinobi init`, you'll be guided through an interactive setup proce
 5. Additional features:
    - GitHub Actions workflows
    - Pre-commit hooks with Ruff
-   - Pytest setup
 
 ## Features
 
 - Modern Python project structure with `src` layout
-- Comprehensive test suite with pytest
+- Built-in testing with pytest (always included)
 - Optimized Python `.gitignore` from Toptal
 - MIT License template
 - Interactive project configuration with questionary
@@ -56,6 +55,12 @@ When you run `shinobi init`, you'll be guided through an interactive setup proce
 - Fast and reliable dependency management with `uv`
 - Development dependencies group for testing and linting
 - Pre-commit hooks for automated checks
+
+### 🧪 Testing
+
+- Pytest setup with comprehensive configuration
+- Test directory structure with example tests
+- Pre-configured test discovery and execution
 
 ### 🧰 Code Quality
 
@@ -86,6 +91,7 @@ project_name/
 │   └── main.py      # Main application code
 ├── tests/           # Test directory
 │   └── __init__.py
+│   └── test_main.py # Example test file
 ├── .github/         # GitHub Actions workflows
 │   └── workflows/   # CI/CD workflows
 ├── .vscode/         # VS Code settings
@@ -109,10 +115,10 @@ This project uses Ruff for linting and formatting. To run the checks:
 
 ```bash
 # Lint
-uvx ruff check
+uv run ruff check
 
 # Format
-uvx ruff format
+uv run ruff format
 ```
 
 ### Adding Dependencies

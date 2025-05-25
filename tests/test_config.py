@@ -39,7 +39,6 @@ def test_get_project_config(mock_questionary_fixture):
     mock_questionary_fixture.checkbox.return_value.ask.return_value = [
         "precommit",
         "github",
-        "pytest",
     ]
 
     config = get_project_config()
@@ -48,7 +47,7 @@ def test_get_project_config(mock_questionary_fixture):
     assert config["description"] == "A test project"
     assert config["python_version"] == "3.11"
     assert config["ide"] == "VS Code"
-    assert config["features"] == ["precommit", "github", "pytest"]
+    assert config["features"] == ["precommit", "github"]
     assert config.get("github_url") == ""
     assert config.get("github_owner") == ""
     assert config.get("github_repo") == ""
@@ -101,7 +100,6 @@ def test_get_project_config_cursor_ide(mock_questionary_fixture):
     ]
     mock_questionary_fixture.checkbox.return_value.ask.return_value = [
         "precommit",
-        "pytest",
     ]  # Example features
 
     config = get_project_config()
@@ -110,7 +108,7 @@ def test_get_project_config_cursor_ide(mock_questionary_fixture):
     assert config["description"] == "Cursor project description"
     assert config["python_version"] == "3.9"
     assert config["ide"] == "Cursor"
-    assert config["features"] == ["precommit", "pytest"]
+    assert config["features"] == ["precommit"]
     assert config.get("github_url") == ""
     assert config.get("github_owner") == ""
     assert config.get("github_repo") == ""

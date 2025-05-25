@@ -355,54 +355,11 @@ def initialize_project(config: Dict[str, Any]) -> None:
         console.print("[yellow]Setting up GitHub workflows...[/yellow]")
         setup_github_workflows(project_path)
 
-    if "pytest" in config["features"]:
-        console.print("[yellow]Setting up pytest...[/yellow]")
-        # Add pytest to dev dependencies in pyproject.toml
-        pyproject_path = project_path / "pyproject.toml"
-        if pyproject_path.exists():
-            content = pyproject_path.read_text()
-
-            # Check if dev dependencies section exists
-            if "[dependency-groups]" not in content:
-                # Add dev dependencies section with pytest
-                dev_section = """
-[dependency-groups]
-dev = [
-    "pytest>=7.0.0",
-]
-"""
-                # Find the right spot to insert it (after [project] section)
-                if "[build-system]" in content:
-                    content = content.replace(
-                        "[build-system]", dev_section + "\n[build-system]"
-                    )
-                else:
-                    content += dev_section
-
-            # Check if pytest is already in dev dependencies
-            elif "pytest" not in content:
-                # Insert pytest into existing dev dependencies
-                import re
-
-                dev_pattern = (
-                    r"(\[dependency-groups\]\s*\ndev\s*=\s*\[(?:[^\]]*\n)?)(\])"
-                )
-                content = re.sub(dev_pattern, r'\1    "pytest>=7.0.0",\n\2', content)
-
-            # Add pytest configuration
-            pytest_config = """
-[tool.pytest.ini_options]
-pythonpath = ["."]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-"""
-            content += pytest_config
-
-            pyproject_path.write_text(content)
-
-        # Create a basic test file
-        test_file = tests_dir / "test_main.py"
-        test_file.write_text('''def test_example():
+    # Always set up pytest
+    console.print("[yellow]Setting up pytest...[/yellow]")
+    # Create a basic test file
+    test_file = tests_dir / "test_main.py"
+    test_file.write_text('''def test_example():
     """Example test."""
     assert True
 ''')
