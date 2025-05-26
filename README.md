@@ -4,7 +4,9 @@
   <img src="images/shinobi.png" width="500">
   <p>Enhanced project initialization tool built on top of `uv`. Shinobi helps you set up Python projects with best practices and common tools pre-configured.</p>
 
+[![PyPI](https://badge.fury.io/py/shinobi.svg)](https://badge.fury.io/py/shinobi)
 [![Unit Tests](https://github.com/iantimmis/shinobi/actions/workflows/test.yml/badge.svg)](https://github.com/iantimmis/shinobi/actions/workflows/test.yml)
+[![Downloads](https://static.pepy.tech/badge/shinobi)](https://pepy.tech/project/shinobi)
 [![Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -14,7 +16,7 @@
 
 ```bash
 # Install Shinobi
-Will soon deploy to pip
+pip install shinobi
 ```
 
 ## Usage
