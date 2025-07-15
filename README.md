@@ -14,9 +14,10 @@
 
 ## Installation
 
+Right now the only way to install shinobi is through pip. Soon we will make it available through installer / brew
 ```bash
 # Install Shinobi
-pip install shinobi
+pip install shinobi 
 ```
 
 ## Usage
