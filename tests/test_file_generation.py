@@ -3,7 +3,7 @@
 import pytest
 
 from shinobi.commands.init import (
-    create_cursor_rules,
+    create_agents_md,
     create_license,
     create_readme,
     create_vscode_settings,
@@ -101,15 +101,17 @@ def test_create_vscode_extensions(project_path):
     assert content.count("]") == 1  # One closing bracket for the array
 
 
-def test_create_cursor_rules(project_path):
-    """Test Cursor rules generation."""
-    create_cursor_rules(project_path)
+def test_create_agents_md(project_path):
+    """Test AGENTS.md generation."""
+    project_path.mkdir(parents=True, exist_ok=True)
+    create_agents_md(project_path)
 
-    rules_path = project_path / ".cursor" / "rules" / "use-uv-always.mdc"
-    assert rules_path.exists()
-    content = rules_path.read_text()
+    agents_path = project_path / "AGENTS.md"
+    assert agents_path.exists()
+    content = agents_path.read_text()
     assert "Always Use UV for Python" in content
-    assert "Package Management" in content
+    assert "uv add" in content
+    assert "uv sync" in content
 
 
 def test_setup_github_workflows(project_path):

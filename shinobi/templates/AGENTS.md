@@ -1,9 +1,4 @@
----
-description:
-globs:
-alwaysApply: true
----
- # Always Use UV for Python
+# Always Use UV for Python
 
 This project uses `uv` as the Python package manager and environment tool. Follow these guidelines:
 
@@ -25,12 +20,6 @@ This project uses `uv` as the Python package manager and environment tool. Follo
   ```bash
   uv run myfile.py
   ```
-
-## Benefits of UV
-
-- Faster than pip
-- Better dependency resolution
-- Built-in virtual environment management
 
 ## Common Commands
 
