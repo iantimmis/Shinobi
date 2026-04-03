@@ -263,13 +263,15 @@ def create_gitignore(project_path: Path) -> None:
     shutil.copy(gitignore_source, gitignore_dest)
 
 
-def initialize_project(config: dict[str, Any]) -> None:
+def initialize_project(config: dict[str, Any], base_dir: Path | None = None) -> None:
     """Initialize a new Python project with enhanced features.
 
     Args:
         config: Project configuration
+        base_dir: Directory in which to create the project. Defaults to CWD.
     """
-    project_path = Path(config["project_name"])
+    base = base_dir or Path.cwd()
+    project_path = base / config["project_name"]
 
     if project_path.exists():
         if not Confirm.ask(
@@ -279,7 +281,7 @@ def initialize_project(config: dict[str, Any]) -> None:
 
     # Run uv init
     console.print("\n[yellow]Running uv init...[/yellow]")
-    run_command(["uv", "init", config["project_name"]])
+    run_command(["uv", "init", config["project_name"]], cwd=base)
 
     # Move hello.py to main.py if it exists
     hello_py = project_path / "hello.py"

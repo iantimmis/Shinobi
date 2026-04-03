@@ -46,3 +46,4 @@ quote-style = "double"
 pythonpath = ["."]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+markers = ["integration: end-to-end tests that invoke uv init (slower)"]
