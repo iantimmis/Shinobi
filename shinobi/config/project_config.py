@@ -1,14 +1,12 @@
 """Project configuration utilities."""
 
-from typing import Optional
-
 import questionary
 
 from shinobi.core.utils import console
 from shinobi.validation.validators import validate_project_name
 
 
-def get_project_config() -> Optional[dict]:
+def get_project_config() -> dict | None:
     """Get project configuration through interactive prompts.
 
     Returns:

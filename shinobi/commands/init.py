@@ -3,7 +3,7 @@
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import typer
 from rich.prompt import Confirm
@@ -59,21 +59,21 @@ dev = [
             if "ruff" not in content:
                 content = re.sub(dev_pattern, r'\1    "ruff>=0.3.0",\n\2', content)
 
-        # Add Ruff configuration at the end of the file
-        ruff_config = """
+        if "[tool.ruff]" not in content:
+            ruff_config = """
 [tool.ruff]
 line-length = 88
-target-version = "py312"
+target-version = "py313"
 fix = true
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
-ignore = ["E501"]  # Example: ignore line length
+ignore = ["E501"]
 
 [tool.ruff.format]
 quote-style = "double"
 """
-        content += ruff_config
+            content += ruff_config
 
         pyproject_path.write_text(content)
 
@@ -125,19 +125,15 @@ def create_vscode_settings(project_path: Path) -> None:
     shutil.copy(extensions_source, extensions_dest)
 
 
-def create_cursor_rules(project_path: Path) -> None:
-    """Create Cursor rules file.
+def create_agents_md(project_path: Path) -> None:
+    """Create an AGENTS.md file with project conventions for AI coding tools.
 
     Args:
         project_path: Path to the project directory
     """
-    cursor_dir = project_path / ".cursor" / "rules"
-    cursor_dir.mkdir(parents=True, exist_ok=True)
-
-    # Copy cursor rules from template
-    rules_source = TEMPLATES_DIR / "ide" / "cursor" / "rules" / "use-uv-always.mdc"
-    rules_dest = cursor_dir / "use-uv-always.mdc"
-    shutil.copy(rules_source, rules_dest)
+    agents_source = TEMPLATES_DIR / "AGENTS.md"
+    agents_dest = project_path / "AGENTS.md"
+    shutil.copy(agents_source, agents_dest)
 
 
 def create_readme(project_path: Path, config: dict) -> None:
@@ -267,54 +263,15 @@ def create_gitignore(project_path: Path) -> None:
     shutil.copy(gitignore_source, gitignore_dest)
 
 
-def create_pyproject_toml(project_path: Path, config: Dict[str, Any]) -> None:
-    """Create a pyproject.toml file for the project.
-
-    Args:
-        project_path: Path to the project directory
-        config: Project configuration
-    """
-    # Check if we should create a new pyproject.toml or update the existing one
-    pyproject_path = project_path / "pyproject.toml"
-
-    if not pyproject_path.exists():
-        # Read template and substitute variables
-        pyproject_template_path = TEMPLATES_DIR / "project" / "pyproject.toml.template"
-        with open(pyproject_template_path, "r") as f:
-            pyproject_template = f.read()
-
-        # Set default values
-        description = config.get("description") or ""
-        python_version = config.get("python_version") or "3.13"
-        python_version_nodot = python_version.replace(".", "")
-
-        # Render the template using simple string replacement
-        pyproject_content = pyproject_template
-        pyproject_content = pyproject_content.replace(
-            "{project_name}", config["project_name"]
-        )
-        pyproject_content = pyproject_content.replace("{description}", description)
-        pyproject_content = pyproject_content.replace(
-            "{python_version}", python_version
-        )
-        pyproject_content = pyproject_content.replace(
-            "{python_version_nodot}", python_version_nodot
-        )
-
-        # Write the output
-        pyproject_path.write_text(pyproject_content)
-    else:
-        # Update existing pyproject.toml
-        update_pyproject_description(pyproject_path, config.get("description", ""))
-
-
-def initialize_project(config: Dict[str, Any]) -> None:
+def initialize_project(config: dict[str, Any], base_dir: Path | None = None) -> None:
     """Initialize a new Python project with enhanced features.
 
     Args:
         config: Project configuration
+        base_dir: Directory in which to create the project. Defaults to CWD.
     """
-    project_path = Path(config["project_name"])
+    base = base_dir or Path.cwd()
+    project_path = base / config["project_name"]
 
     if project_path.exists():
         if not Confirm.ask(
@@ -324,7 +281,7 @@ def initialize_project(config: Dict[str, Any]) -> None:
 
     # Run uv init
     console.print("\n[yellow]Running uv init...[/yellow]")
-    run_command(["uv", "init", config["project_name"]])
+    run_command(["uv", "init", config["project_name"]], cwd=base)
 
     # Move hello.py to main.py if it exists
     hello_py = project_path / "hello.py"
@@ -417,11 +374,10 @@ python_files = ["test_*.py"]
     create_license(project_path)
 
     # Set up IDE configuration
-    if config["ide"] == "VS Code":
+    if config["ide"] in ("VS Code", "Cursor"):
         create_vscode_settings(project_path)
-    elif config["ide"] == "Cursor":
-        create_vscode_settings(project_path)  # Cursor also uses VS Code settings
-        create_cursor_rules(project_path)
+
+    create_agents_md(project_path)
 
     console.print("\n[green]Project initialized successfully![/green]")
     console.print("\nNext steps:")

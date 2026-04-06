@@ -24,7 +24,7 @@ def validate_project_name(name: str) -> tuple[bool, str]:
         return False, "Project name must start and end with a letter or digit"
 
     # Check if contains only allowed characters
-    if not re.match(r"^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]$", name):
+    if not re.match(r"^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?$", name):
         return False, "Project name may only contain letters, digits, '-', '_', and '.'"
 
     return True, ""

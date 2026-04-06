@@ -63,13 +63,11 @@ def test_get_project_config_minimal(mock_questionary_fixture):
     mock_questionary_fixture.text.return_value.ask.side_effect = [
         "minimal-project",  # Project name
         "Minimal description",  # Description
-        "",  # GitHub URL (optional)
-        "",  # GitHub owner (optional)
-        "",  # GitHub repo (optional)
+        "",  # GitHub owner (empty = no GitHub)
     ]
     mock_questionary_fixture.select.return_value.ask.side_effect = [
-        "3.10",  # Python version
-        "None",  # IDE
+        "3.11",  # Python version
+        "Other",  # IDE
     ]
     mock_questionary_fixture.checkbox.return_value.ask.return_value = []  # No features
 
@@ -77,8 +75,8 @@ def test_get_project_config_minimal(mock_questionary_fixture):
 
     assert config["project_name"] == "minimal-project"
     assert config["description"] == "Minimal description"
-    assert config["python_version"] == "3.10"
-    assert config["ide"] == "None"
+    assert config["python_version"] == "3.11"
+    assert config["ide"] == "Other"
     assert config["features"] == []
     assert config.get("github_url") == ""
     assert config.get("github_owner") == ""
@@ -90,23 +88,21 @@ def test_get_project_config_cursor_ide(mock_questionary_fixture):
     mock_questionary_fixture.text.return_value.ask.side_effect = [
         "cursor-project",  # Project name
         "Cursor project description",  # Description
-        "",  # GitHub URL (optional)
-        "",  # GitHub owner (optional)
-        "",  # GitHub repo (optional)
+        "",  # GitHub owner (empty = no GitHub)
     ]
     mock_questionary_fixture.select.return_value.ask.side_effect = [
-        "3.9",  # Python version
+        "3.12",  # Python version
         "Cursor",  # IDE
     ]
     mock_questionary_fixture.checkbox.return_value.ask.return_value = [
         "precommit",
-    ]  # Example features
+    ]
 
     config = get_project_config()
 
     assert config["project_name"] == "cursor-project"
     assert config["description"] == "Cursor project description"
-    assert config["python_version"] == "3.9"
+    assert config["python_version"] == "3.12"
     assert config["ide"] == "Cursor"
     assert config["features"] == ["precommit"]
     assert config.get("github_url") == ""

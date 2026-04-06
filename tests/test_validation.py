@@ -13,6 +13,8 @@ from shinobi.validation.validators import validate_project_name
         ("valid.name", True, ""),
         ("valid123", True, ""),
         ("123valid", True, ""),
+        ("a", True, ""),
+        ("x", True, ""),
         ("", False, "Project name cannot be empty"),
         ("-invalid", False, "Project name must start and end with a letter or digit"),
         ("invalid-", False, "Project name must start and end with a letter or digit"),
