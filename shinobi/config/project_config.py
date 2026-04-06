@@ -72,7 +72,6 @@ def get_project_config() -> dict | None:
         python_version = questionary.select(
             "Which Python version would you like to use?",
             choices=["3.13", "3.12", "3.11"],
-            default="3.13",
         ).ask()
 
         if python_version is None:  # User pressed Ctrl+C
@@ -82,7 +81,6 @@ def get_project_config() -> dict | None:
         ide = questionary.select(
             "Which IDE are you using?",
             choices=["Cursor", "VS Code", "Other"],
-            default="VS Code",
         ).ask()
 
         if ide is None:  # User pressed Ctrl+C
